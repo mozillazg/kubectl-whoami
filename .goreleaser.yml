@@ -7,17 +7,15 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - env:
+  - main: ./cmd/kubectl-whoami/main.go
+    binary: kubectl-whoami
+    env:
       - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-    main: ./cmd/kubectl-whoami/main.go
     flags:
       - -trimpath
     ldflags:
       - -s -w
+      - "-extldflags '-static'"
       - -X {{.ModulePath}}/pkg/version.Version={{.Version}}
       - -X {{.ModulePath}}/pkg/version.Commit={{.ShortCommit}}
       - -X {{.ModulePath}}/pkg/version.Date={{.Date}}
@@ -26,13 +24,39 @@ builds:
     gcflags:
       - all=-trimpath={{.Env.GOPATH}}
       - ./dontoptimizeme=-N
+    goos:
+      - linux
+      - windows
+      - darwin
+      - freebsd
+      - openbsd
+    goarch:
+      - amd64
+      - "386"
+      - arm
+      - arm64
+      - ppc64le
+    goarm:
+      - "7"
 archives:
-  - replacements:
-      darwin: Darwin
+  - format: tar.gz
+    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+    replacements:
+      amd64: 64bit
+      386: 32bit
+      arm: ARM
+      arm64: ARM64
+      ppc64le: PPC64LE
+      darwin: macOS
       linux: Linux
       windows: Windows
-      386: i386
-      amd64: x86_64
+      openbsd: OpenBSD
+      netbsd: NetBSD
+      freebsd: FreeBSD
+      dragonfly: DragonFlyBSD
+    format_overrides:
+      - goos: windows
+        format: zip
 checksum:
   name_template: 'checksums.txt'
 snapshot:
