@@ -24,9 +24,13 @@ NotAfter(not_after): {{ .NotAfter }}
 
 var rePEM = regexp.MustCompile(`-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----`)
 
-func GetCertInfo(config *rest.Config) ([]certinfo.Certificate, error) {
+func GetCertInfo(config *rest.Config, ca bool) ([]certinfo.Certificate, error) {
 	var certs []certinfo.Certificate
-	for _, b := range rePEM.FindAll(config.CertData, -1) {
+	certData := config.CertData
+	if ca {
+		certData = config.CAData
+	}
+	for _, b := range rePEM.FindAll(certData, -1) {
 		cert, err := certinfo.ParseCertificatePEM(b)
 		if err != nil {
 			return certs, err

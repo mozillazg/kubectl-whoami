@@ -26,6 +26,8 @@ func showVersion() {
 func main() {
 	raw := flag.Bool("raw", false, "output raw json result")
 	ver := flag.Bool("version", false, "show version and exit")
+	viewCA := flag.Bool("ca", false, "read cert from `certificate-authority-data`")
+	// viewCert := flag.Bool("cert", true, "read cert from `client-certificate-data`")
 	flag.Parse()
 
 	if *ver {
@@ -38,7 +40,7 @@ func main() {
 		fmt.Printf("parse kubeconfig failed: %+v", err)
 		os.Exit(1)
 	}
-	certs, err := cert.GetCertInfo(cfg)
+	certs, err := cert.GetCertInfo(cfg, *viewCA)
 	if err != nil {
 		fmt.Printf("parse certinfo failed: %+v", err)
 		os.Exit(1)
