@@ -25,6 +25,7 @@ raw:
 
 ```
 $ kubectl-whoami --raw
+[
 {
  "subject": {
   "common_name": "kubernetes-admin",
@@ -48,4 +49,5 @@ $ kubectl-whoami --raw
  "subject_key_id": "",
  "pem": "-----BEGIN CERTIFICATE-----\nMIIC8jCCAdqgAwIBAgIIPBs...H8l3aWY=\n-----END CERTIFICATE-----\n"
 }
+]
 ```

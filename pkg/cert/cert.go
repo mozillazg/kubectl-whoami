@@ -3,6 +3,7 @@ package cert
 import (
 	"bytes"
 	"encoding/json"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -21,8 +22,18 @@ NotBefore(not_before): {{ .NotBefore }}
 NotAfter(not_after): {{ .NotAfter }}
 `
 
-func GetCertInfo(config *rest.Config) (*certinfo.Certificate, error) {
-	return certinfo.ParseCertificatePEM(config.CertData)
+var rePEM = regexp.MustCompile(`-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----`)
+
+func GetCertInfo(config *rest.Config) ([]certinfo.Certificate, error) {
+	var certs []certinfo.Certificate
+	for _, b := range rePEM.FindAll(config.CertData, -1) {
+		cert, err := certinfo.ParseCertificatePEM(b)
+		if err != nil {
+			return certs, err
+		}
+		certs = append(certs, *cert)
+	}
+	return certs, nil
 }
 
 func Summary(c certinfo.Certificate) string {
@@ -35,7 +46,7 @@ func Summary(c certinfo.Certificate) string {
 	return strings.TrimSpace(b.String())
 }
 
-func ToJSON(c certinfo.Certificate) string {
-	d, _ := json.MarshalIndent(c, "", " ")
+func ToJSON(certs []certinfo.Certificate) string {
+	d, _ := json.MarshalIndent(certs, "", " ")
 	return strings.TrimSpace(string(d))
 }

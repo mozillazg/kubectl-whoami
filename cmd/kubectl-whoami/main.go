@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/mozillazg/kubectl-whoami/pkg/cert"
 	"github.com/mozillazg/kubectl-whoami/pkg/version"
@@ -37,17 +38,19 @@ func main() {
 		fmt.Printf("parse kubeconfig failed: %+v", err)
 		os.Exit(1)
 	}
-	c, err := cert.GetCertInfo(cfg)
+	certs, err := cert.GetCertInfo(cfg)
 	if err != nil {
 		fmt.Printf("parse certinfo failed: %+v", err)
 		os.Exit(1)
 	}
 
-	d := ""
+	result := []string{}
 	if *raw {
-		d = cert.ToJSON(*c)
+		result = append(result, cert.ToJSON(certs))
 	} else {
-		d = cert.Summary(*c)
+		for _, c := range certs {
+			result = append(result, cert.Summary(c))
+		}
 	}
-	fmt.Println(d)
+	fmt.Println(strings.Join(result, "------"))
 }
