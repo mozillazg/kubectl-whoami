@@ -54,5 +54,5 @@ func main() {
 			result = append(result, cert.Summary(c))
 		}
 	}
-	fmt.Println(strings.Join(result, "------"))
+	fmt.Println(strings.Join(result, "\n------------\n"))
 }
